@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import pickle
 import requests
+import lzma
 
 def fetch_poster(movie_id):
     response = requests.get('https://api.themoviedb.org/3/movie/{}?api_key=8265bd1679663a7ea12ac168da84d2e8&language=en-US'.format(movie_id))
@@ -12,7 +13,8 @@ def fetch_poster(movie_id):
 movies_dict = pickle.load(open('movie_dict.pkl', 'rb'))
 movies = pd.DataFrame(movies_dict)
 
-similarity = pickle.load(open('similarity.pkl', 'rb'))
+with lzma.open('similarity.pkl.xz', 'rb') as f:
+    similarity = pickle.load(f)
 
 def recommend(movie):
     movie_index = movies[movies['title'] == movie].index[0]
@@ -62,3 +64,4 @@ if st.button("Recommend"):
     with col5:
         st.text(names[4])
         st.image(posters[4])
+
